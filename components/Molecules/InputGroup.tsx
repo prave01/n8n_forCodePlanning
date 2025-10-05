@@ -1,20 +1,18 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import ImportSvg from "../SVGs/ImportSvg";
 
 export const InputGroup = () => {
-  const [selectedFile, setSelectedFile] = useState<any>(null);
-
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [githubUrl, setGithubUrl] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
     if (isGitHubUrl(githubUrl)) return toast.success("Processing");
-    toast.error("Invalid github repo like");
+    toast.error("Invalid github repo link");
   };
 
   const isGitHubUrl = (url: string) => {
@@ -24,23 +22,29 @@ export const InputGroup = () => {
   };
 
   const handleFileChange = (e: any) => {
-    if (String(e?.target?.files[0]?.name).split(".")[1] === "zip") {
-      setSelectedFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.name.split(".").pop() === "zip") {
+      setSelectedFile(file);
       toast.success("File Imported Successfully");
       return;
     }
     toast.error("Unsupported File Type");
   };
 
+  const removeFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // reset the input so it can be selected again
+    }
+  };
+
   return (
-    <div
-      className={`
-        max-w-[400px] w-full h-[200px] bg-muted lg:scale-124 rounded-lg border-2
-        border-zinc-500 dark:border-border border-dashed flex items-center justify-center gap-y-2 flex-col
-      `}
-    >
+    <div className="w-[400px] h-[200px] bg-muted lg:scale-124 rounded-lg border-2 border-zinc-500 dark:border-border border-dashed flex items-center justify-center gap-y-2 flex-col">
       <div className="flex items-center justify-center gap-y-2 flex-col">
         <Input
+          ref={fileInputRef}
           onChange={handleFileChange}
           type="file"
           id="file"
@@ -51,11 +55,25 @@ export const InputGroup = () => {
           <ImportSvg className="dark:stroke-zinc-400 stroke-black dark:bg-black bg-zinc-200 rounded-lg p-2 size-9" />
         </label>
         {selectedFile && (
-          <span className="text-xs text-orange-500">{selectedFile?.name}</span>
+          <div className="flex gap-x-2 items-center justify-center">
+            <div className="text-xs bg-background rounded-lg px-2 py-1 text-orange-500">
+              {selectedFile.name}
+            </div>
+            <button
+              type="button"
+              onClick={removeFile}
+              className="text-xs rounded-full flex cursor-pointer items-center justify-center text-accent-foreground"
+            >
+              x
+            </button>
+          </div>
         )}
       </div>
-      <div className="text-[12px] space-y-2 w-full tracking-tight leading-5 h-auto text-center ">
-        Import the project as Zip file or <br /> Paste the Github URL of the
+      <div className="text-[12px] space-y-2 w-full tracking-tight leading-5 h-auto text-center">
+        Import the project as{" "}
+        <span className="text-orange-500 font-semibold">Zip file</span> or{" "}
+        <br /> Paste the{" "}
+        <span className="text-orange-500 font-semibold">Github URL</span> of the
         repo here
       </div>
       <form
@@ -66,6 +84,7 @@ export const InputGroup = () => {
           value={githubUrl}
           onChange={(e) => setGithubUrl(e.target.value)}
           type="text"
+          required
           className="flex-1 text-xs h-8 placeholder:text-xs"
           placeholder="Paste url here"
         />
