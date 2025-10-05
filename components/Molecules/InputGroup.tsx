@@ -36,7 +36,7 @@ export const InputGroup = () => {
   const removeFile = () => {
     setSelectedFile(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // reset the input so it can be selected again
+      fileInputRef.current.value = "";
     }
   };
 
@@ -52,7 +52,7 @@ export const InputGroup = () => {
           className="z-10 absolute"
         />
         <label htmlFor="file">
-          <ImportSvg className="dark:stroke-zinc-400 stroke-black dark:bg-black bg-zinc-200 rounded-lg p-2 size-9" />
+          <ImportSvg className="dark:stroke-zinc-400 cursor-pointer stroke-black dark:bg-black bg-zinc-200 rounded-lg p-2 size-9" />
         </label>
         {selectedFile && (
           <div className="flex gap-x-2 items-center justify-center">
