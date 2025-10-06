@@ -3,11 +3,15 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import ImportSvg from "../SVGs/ImportSvg";
+import { useFileStore } from "@/app/store/useFileStore";
+import { redirect } from "next/navigation";
 
 export const InputGroup = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [githubUrl, setGithubUrl] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const setArrayBuffer = useFileStore((s) => s.setArrayBuffer);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -21,7 +25,7 @@ export const InputGroup = () => {
     return githubRegex.test(url);
   };
 
-  const handleFileChange = (e: any) => {
+  const handleFileChange = async (e: any) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -33,6 +37,13 @@ export const InputGroup = () => {
     toast.error("Unsupported File Type");
   };
 
+  const handleFileSubmit = async () => {
+    const Buffer = await selectedFile?.arrayBuffer();
+    if (!Buffer) return;
+    setArrayBuffer(Buffer);
+    redirect("/prePlan/startPlan");
+  };
+
   const removeFile = () => {
     setSelectedFile(null);
     if (fileInputRef.current) {
@@ -41,35 +52,71 @@ export const InputGroup = () => {
   };
 
   return (
-    <div className="w-[400px] h-[200px] bg-muted lg:scale-124 rounded-lg border-2 border-zinc-500 dark:border-border border-dashed flex items-center justify-center gap-y-2 flex-col">
+    <div
+      className="w-[400px] h-[200px] bg-muted lg:scale-124 rounded-lg border-2
+        border-zinc-500 dark:border-border border-dashed flex items-center
+        justify-center gap-y-2 flex-col"
+    >
       <div className="flex items-center justify-center gap-y-2 flex-col">
-        <Input
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          type="file"
-          id="file"
-          hidden
-          className="z-10 absolute"
-        />
-        <label htmlFor="file">
-          <ImportSvg className="dark:stroke-zinc-400 cursor-pointer stroke-black dark:bg-black bg-zinc-200 rounded-lg p-2 size-9" />
-        </label>
+        <div className="flex gap-x-2">
+          <div className="flex items-center justify-center gap-x-2">
+            <Input
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              type="file"
+              id="file"
+              hidden
+              className="z-10 absolute"
+            />
+
+            <label
+              htmlFor="file"
+              className="flex items-center gap-x-2 cursor-pointer p-1 dark:bg-black bg-zinc-200 rounded-lg"
+            >
+              <Button
+                onClick={handleFileSubmit}
+                size={"icon-sm"}
+                disabled={selectedFile ? false : true}
+                className="text-xs rounded-md bg-black dark:hover:text-white
+            cursor-pointer"
+              >
+                <ImportSvg className="dark:stroke-zinc-400 stroke-black size-5 p-1" />
+              </Button>
+            </label>
+            <Button
+              onClick={handleFileSubmit}
+              size={"sm"}
+              disabled={selectedFile ? false : true}
+              className="text-xs rounded-md dark:hover:bg-black dark:hover:text-white
+            cursor-pointer"
+            >
+              Go
+            </Button>
+          </div>
+        </div>
         {selectedFile && (
           <div className="flex gap-x-2 items-center justify-center">
-            <div className="text-xs bg-background rounded-lg px-2 py-1 text-orange-500">
+            <div
+              className="text-xs bg-background rounded-lg px-2 py-1
+                text-orange-500"
+            >
               {selectedFile.name}
             </div>
             <button
               type="button"
               onClick={removeFile}
-              className="text-xs rounded-full flex cursor-pointer items-center justify-center text-accent-foreground"
+              className="text-xs rounded-full flex cursor-pointer items-center
+                justify-center text-accent-foreground"
             >
               x
             </button>
           </div>
         )}
       </div>
-      <div className="text-[12px] space-y-2 w-full tracking-tight leading-5 h-auto text-center">
+      <div
+        className="text-[12px] space-y-2 w-full tracking-tight leading-5 h-auto
+          text-center"
+      >
         Import the project as{" "}
         <span className="text-orange-500 font-semibold">Zip file</span> or{" "}
         <br /> Paste the{" "}
@@ -88,8 +135,11 @@ export const InputGroup = () => {
           className="flex-1 text-xs h-8 placeholder:text-xs"
           placeholder="Paste url here"
         />
-        <Button className="text-xs px-2 h-8 dark:hover:bg-black dark:hover:text-white cursor-pointer">
-          Submit
+        <Button
+          className="text-xs px-2 h-8 dark:hover:bg-black dark:hover:text-white
+            cursor-pointer"
+        >
+          Go
         </Button>
       </form>
     </div>
