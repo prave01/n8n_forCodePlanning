@@ -16,7 +16,7 @@ export function FileTreeView({
   const [selectedPath, setSelectedPath] = useState<string>("");
 
   return (
-    <div className="font-mono dark:bg-black bg-transparent text-sm pl-5 pt-5 space-y-1">
+    <div className="font-mono dark:bg-black child bg-transparent h-full text-sm pl-5 pt-5 space-y-1">
       {Object.entries(data).map(([key, value]) => (
         <TreeNode
           key={key}
@@ -78,7 +78,7 @@ function TreeNode({
         }}
         className={cn(
           "flex items-center justify-start mr-10 cursor-pointer select-none",
-          "hover:bg-muted rounded-md px-2 py-1 max-w-[500px] w-full transition-colors",
+          "hover:bg-muted rounded-md px-2 py-1 w-auto transition-colors",
           isSelected && "bg-muted",
         )}
       >

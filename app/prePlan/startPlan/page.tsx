@@ -12,16 +12,12 @@ import {
 } from "@/components/ui/resizable";
 import ReactDiffViewer from "react-diff-viewer-continued";
 import { CodeBlock } from "@/components/ui/code-block";
+import { CodePanel } from "@/components/Templates/CodePanel";
 
 export default function Page() {
   const router = useRouter();
   const buffer = useFileStore((s) => s.arrayBuffer);
   const [tree, setTree] = useState<any>(null);
-
-  const [currData, setCurrData] = useState<{
-    data: string;
-    name: string;
-  } | null>(null);
 
   useEffect(() => {
     if (!buffer) {
@@ -47,29 +43,7 @@ export default function Page() {
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel>
-          <div className="w-full flex h-screen">
-            <ResizablePanelGroup direction="horizontal">
-              <ResizablePanel>
-                {" "}
-                <FileTreeView setCurrData={setCurrData} data={tree} />
-              </ResizablePanel>
-              <ResizableHandle className="dark:bg-cyan-500 bg-orange-500" />
-              <ResizablePanel>
-                <div
-                  className="h-full w-full flex dark:bg-black bg-zinc-800 overflow-y-auto text-orange-500 text-xl font-semibold
-              border-zinc-700 border-1"
-                >
-                  {currData && (
-                    <CodeBlock
-                      language={"jsx"}
-                      filename={currData.name}
-                      code={currData.data}
-                    />
-                  )}
-                </div>
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          </div>
+          <CodePanel tree={tree} />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
