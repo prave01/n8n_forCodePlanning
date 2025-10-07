@@ -4,18 +4,19 @@ import { useState } from "react";
 import { ChevronDown, ChevronRight, File, Folder } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 
 export function FileTreeView({
   data,
   setCurrData,
 }: {
   data: any;
-  setCurrData: (data: string) => void;
+  setCurrData: ({ data, name }: { data: string; name: string }) => void;
 }) {
   const [selectedPath, setSelectedPath] = useState<string>("");
 
   return (
-    <div className="font-mono text-sm pl-5 pt-5 space-y-1">
+    <div className="font-mono dark:bg-black bg-transparent text-sm pl-5 pt-5 space-y-1">
       {Object.entries(data).map(([key, value]) => (
         <TreeNode
           key={key}
@@ -44,7 +45,7 @@ function TreeNode({
   name: string;
   value: any;
   level: number;
-  setCurrData: (data: string) => void;
+  setCurrData: ({ data, name }: { data: string; name: string }) => void;
   selectedPath: string;
   setSelectedPath: (path: string) => void;
   path: string;
@@ -58,7 +59,7 @@ function TreeNode({
     if (isFolder) {
       setOpen((o) => !o);
     } else {
-      setCurrData(value.data);
+      setCurrData({ data: value.data, name: name });
       setSelectedPath(path);
     }
   };
@@ -76,8 +77,8 @@ function TreeNode({
           }
         }}
         className={cn(
-          "flex items-center mr-10 cursor-pointer select-none",
-          "hover:bg-muted rounded-md px-2 py-1 transition-colors",
+          "flex items-center justify-start mr-10 cursor-pointer select-none",
+          "hover:bg-muted rounded-md px-2 py-1 max-w-[500px] w-full transition-colors",
           isSelected && "bg-muted",
         )}
       >
@@ -91,11 +92,18 @@ function TreeNode({
           <File size={14} className="mr-1 text-zinc-500" />
         )}
         {isFolder && <Folder size={14} className="mr-1 text-yellow-500" />}
-        <span className="overflow-hidden">{name}</span>
+        <span className="">{name}</span>
       </Button>
 
       {isFolder && open && (
-        <div className="border-l border-zinc-700 pl-2 mt-1">
+        <motion.div
+          animate={{ opacity: [0, 1] }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.3,
+          }}
+          className="border-l border-zinc-700 pl-2 mt-1"
+        >
           {Object.entries(value).map(([childName, childValue]) => (
             <TreeNode
               key={childName}
@@ -108,7 +116,7 @@ function TreeNode({
               path={`${path}/${childName}`}
             />
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );

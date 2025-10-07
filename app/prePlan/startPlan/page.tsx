@@ -18,7 +18,10 @@ export default function Page() {
   const buffer = useFileStore((s) => s.arrayBuffer);
   const [tree, setTree] = useState<any>(null);
 
-  const [currData, setCurrData] = useState<string | null>(null);
+  const [currData, setCurrData] = useState<{
+    data: string;
+    name: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!buffer) {
@@ -45,15 +48,27 @@ export default function Page() {
         <ResizableHandle />
         <ResizablePanel>
           <div className="w-full flex h-screen">
-            <FileTreeView setCurrData={setCurrData} data={tree} />
-            <div
-              className="h-full w-full text-orange-500 text-xl font-semibold
+            <ResizablePanelGroup direction="horizontal">
+              <ResizablePanel>
+                {" "}
+                <FileTreeView setCurrData={setCurrData} data={tree} />
+              </ResizablePanel>
+              <ResizableHandle className="dark:bg-cyan-500 bg-orange-500" />
+              <ResizablePanel>
+                <div
+                  className="h-full w-full flex dark:bg-black bg-zinc-800 overflow-y-auto text-orange-500 text-xl font-semibold
               border-zinc-700 border-1"
-            >
-              {currData && (
-                <CodeBlock language="js" filename="summa" code={currData} />
-              )}
-            </div>
+                >
+                  {currData && (
+                    <CodeBlock
+                      language={"jsx"}
+                      filename={currData.name}
+                      code={currData.data}
+                    />
+                  )}
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
