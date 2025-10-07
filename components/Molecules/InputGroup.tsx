@@ -66,29 +66,26 @@ export const InputGroup = () => {
               type="file"
               id="file"
               hidden
-              className="z-10 absolute"
+              className="z-10 absolute text-xs"
             />
 
             <label
               htmlFor="file"
-              className="flex items-center gap-x-2 cursor-pointer p-1 dark:bg-black bg-zinc-200 rounded-lg"
+              className=" "
             >
-              <Button
+              <div
                 onClick={handleFileSubmit}
-                size={"icon-sm"}
-                disabled={selectedFile ? false : true}
-                className="text-xs rounded-md bg-black dark:hover:text-white
-            cursor-pointer"
-              >
-                <ImportSvg className="dark:stroke-zinc-400 stroke-black size-5 p-1" />
-              </Button>
+                className="cursor-pointer p-2 dark:bg-black 
+                bg-zinc-200 rounded-lg">
+                <ImportSvg className="dark:stroke-zinc-400 stroke-black size-[18px]" />
+              </div>
             </label>
             <Button
               onClick={handleFileSubmit}
-              size={"sm"}
+              size={"icon-sm"}
               disabled={selectedFile ? false : true}
-              className="text-xs rounded-md dark:hover:bg-black dark:hover:text-white
-            cursor-pointer"
+              className="text-xs rounded-md dark:hover:bg-black
+                dark:hover:text-white cursor-pointer"
             >
               Go
             </Button>

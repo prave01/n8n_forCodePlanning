@@ -2,21 +2,24 @@ import JSZip from "jszip";
 
 export async function parseZip(arrayBuffer: ArrayBuffer) {
   const zip = await JSZip.loadAsync(arrayBuffer);
-  const files: { name: string; dir: boolean; path: string }[] = [];
 
-  zip.forEach((relativePath, file) => {
-    files.push({
-      name: file.name.split("/").filter(Boolean).pop() || "",
-      path: relativePath,
-      dir: file.dir,
-    });
-  });
+  const files = await Promise.all(
+    Object.values(zip.files).map(async (file) => {
+      const data = file.dir ? "" : await zip.files[file.name].async("string");
+      return {
+        name: file.name.split("/").filter(Boolean).pop() || "",
+        path: file.name,
+        dir: file.dir,
+        data,
+      };
+    }),
+  );
 
   return files;
 }
 
 export function buildTree(
-  files: { name: string; dir: boolean; path: string }[],
+  files: { name: string; dir: boolean; path: string; data: string }[],
 ) {
   const root: Record<string, any> = {};
 
@@ -25,9 +28,12 @@ export function buildTree(
     let current = root;
 
     parts.forEach((part, idx) => {
+      const isFile = idx === parts.length - 1 && !file.dir;
+
       if (!current[part]) {
-        current[part] = idx === parts.length - 1 && !file.dir ? null : {};
+        current[part] = isFile ? { data: file.data, dir: file.dir } : {};
       }
+
       current = current[part];
     });
   }
