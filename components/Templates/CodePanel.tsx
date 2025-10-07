@@ -16,7 +16,7 @@ export const CodePanel = ({ tree }: { tree: string }) => {
   return (
     <div className="w-full flex h-screen">
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel className="overflow-y-scroll">
+        <ResizablePanel defaultSize={20} className="overflow-y-scroll">
           {" "}
           <div className="overflow-y-scroll h-full parent">
             <FileTreeView setCurrData={setCurrData} data={tree} />

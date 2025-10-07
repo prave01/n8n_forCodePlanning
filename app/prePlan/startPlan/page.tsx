@@ -13,6 +13,12 @@ import {
 import ReactDiffViewer from "react-diff-viewer-continued";
 import { CodeBlock } from "@/components/ui/code-block";
 import { CodePanel } from "@/components/Templates/CodePanel";
+import { Bitcount_Prop_Double } from "next/font/google";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { motion } from "motion/react";
+import { Plan } from "@/components/Templates/Plan";
 
 export default function Page() {
   const router = useRouter();
@@ -36,10 +42,13 @@ export default function Page() {
   if (!tree) return <div className="text-center text-sm mt-10">Loading...</div>;
 
   return (
-    <div className="flex gap-5 items-center justify-center w-full h-full min-h-screen">
+    <div
+      className="flex gap-5 items-center justify-center 
+      w-full h-full min-h-screen"
+    >
       <ResizablePanelGroup direction={"horizontal"}>
-        <ResizablePanel>
-          <div className="bg-muted p-5 w-full h-full"></div>
+        <ResizablePanel defaultSize={25}>
+          <Plan />
         </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel>
