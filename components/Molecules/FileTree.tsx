@@ -17,7 +17,7 @@ export function FileTreeView({
 
   return (
     <div
-      className="font-mono dark:bg-black bg-zinc-100 child h-full text-sm
+      className="font-mono dark:bg-black bg-zinc-800 child h-full text-sm
         pl-5 pt-5 space-y-1"
     >
       {Object.entries(data).map(([key, value]) => (
@@ -83,7 +83,7 @@ function TreeNode({
         className={cn(
           "flex items-center justify-start mr-10 cursor-pointer select-none",
           "hover:bg-muted rounded-md px-2 py-1 w-auto transition-colors",
-          isSelected && "bg-muted",
+          isSelected && "bg-foreground dark:bg-muted text-orange-500",
         )}
       >
         {isFolder ? (

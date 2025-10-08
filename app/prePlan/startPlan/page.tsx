@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/resizable";
 import { CodePanel } from "@/components/Templates/CodePanel";
 import { Plan } from "@/components/Templates/Plan";
+import { GridLoader } from "react-spinners";
 
 export default function Page() {
   const router = useRouter();
@@ -31,7 +32,13 @@ export default function Page() {
     })();
   }, [buffer, router]);
 
-  if (!tree) return <div className="text-center text-sm mt-10">Loading...</div>;
+  if (!tree)
+    return (
+      <div className="absolute inset-0 flex items-center justify-center">
+        {" "}
+        <GridLoader color="#ff4d00" />
+      </div>
+    );
 
   return (
     <div className="flex gap-5 items-center overflow-hidden relative justify-center w-full h-full min-h-screen">

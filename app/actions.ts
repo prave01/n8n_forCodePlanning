@@ -14,6 +14,8 @@ export const generatePlan = async (
     throw Error("No context added, please add enough context");
   }
 
+  console.log(context);
+
   if (!API_KEY) {
     throw Error("Add API key in the configuration of the AI client");
   }
@@ -35,12 +37,13 @@ in the format like this,, based on the user input.
 
 I will give you the data of the file which is user want it to be edited
 --Context (The data given by the user)
-${context}
+${JSON.stringify(context, null, 2)}
 
 --Format (An array of plans)
 [
   {
     planName:<Plan name>,
+    targetFile:<Which file is targeted to execute this plan>,   
     description:<The description for the plan>,
     plan_prompt:<Well optimized prompt for this particular plan, this is for the next AI executiong so be it>  
   }
@@ -50,7 +53,8 @@ NOTE:
 - The plan description should be precise to the point
 - It should completely satisfy the user input
 - You can generate how many plans as you want based on the complexity of the given task
-- The prompt you are generating is should able to solve user need based on the CONEXT they have provide you
+- The prompt you are generating is should able to solve user need based on the CONTEXT they have provide you
+- If the CONTEXT data has multiple files the plan can be whatever you want to be, but end of the day it should satisfies the user input completely
 `,
         },
         {
@@ -64,6 +68,7 @@ NOTE:
     const event = response.choices[0].message.parsed;
 
     console.log("AI response", event);
+    return event;
   } catch (err: any) {
     console.error("AI Error:", err);
     throw new Error("Internal error: " + err.message);

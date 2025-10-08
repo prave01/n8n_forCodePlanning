@@ -2,13 +2,43 @@ import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Bitcount_Prop_Double } from "next/font/google";
 import { useState, useRef, useEffect, ReactNode } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useAnimation } from "motion/react";
 import { toast } from "sonner";
 import { generatePlan } from "@/app/actions";
+import { z } from "zod";
+import { Plan_ResponseFormat } from "@/app/zodSchema";
+import GridLoader from "react-spinners/GridLoader";
 
 const bitCount = Bitcount_Prop_Double({
   subsets: ["latin"],
 });
+
+type PlanResponseType = z.infer<typeof Plan_ResponseFormat>;
+
+function findDataByKey(tree: Record<string, any>, key: string): string | null {
+  for (const [k, value] of Object.entries(tree)) {
+    const isFolder = value && typeof value === "object" && !("data" in value);
+
+    if (k === key && !isFolder) {
+      return value.data;
+    }
+
+    if (isFolder) {
+      const result = findDataByKey(value, key);
+      if (result !== null) return result;
+    }
+  }
+  return null;
+}
+
+const traverse = (tree: Record<string, any>, results: string[] = []) => {
+  Object.entries(tree).forEach(([key, value]) => {
+    const isFolder = value && typeof value === "object" && !("data" in value);
+    if (isFolder) traverse(value, results);
+    else results.push(key);
+  });
+  return results;
+};
 
 export const Plan = ({ tree }: { tree: Record<string, any> }) => {
   const [input, setInput] = useState("");
@@ -18,17 +48,9 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
   const [contextItems, setContextItems] = useState<Array<string>>([]);
   const [allSuggestions, setAllSuggestions] = useState<Array<string>>([]);
   const [contextData, setContextData] = useState<Record<string, string>>();
+  const [loading, setLoading] = useState(false);
 
   const suggestionRefs = useRef<Array<HTMLDivElement | null>>([]);
-
-  const traverse = (tree: Record<string, any>, results: string[] = []) => {
-    Object.entries(tree).forEach(([key, value]) => {
-      const isFolder = value && typeof value === "object" && !("data" in value);
-      if (isFolder) traverse(value, results);
-      else results.push(key);
-    });
-    return results;
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -98,50 +120,46 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
     }
   }, [activeIndex, openSuggession]);
 
-  function findDataByKey(
-    tree: Record<string, any>,
-    key: string,
-  ): string | null {
-    for (const [k, value] of Object.entries(tree)) {
-      const isFolder = value && typeof value === "object" && !("data" in value);
-
-      if (k === key && !isFolder) {
-        return value.data;
-      }
-
-      if (isFolder) {
-        const result = findDataByKey(value, key);
-        if (result !== null) return result;
-      }
-    }
-    return null;
-  }
-
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (contextItems.length === 0) {
       toast.error("Please add some context");
       return;
     }
+
+    const newContextData: Record<string, string> = {};
     contextItems.forEach((i) => {
       const data = findDataByKey(tree, i);
-      setContextData((prev) => ({
-        ...prev,
-        [i]: data as string,
-      }));
+      if (data) newContextData[i] = data;
     });
 
-    // generate plan
-    if (!contextData) return toast.error("No context added");
+    if (Object.keys(newContextData).length === 0) {
+      return toast.error("No context added");
+    }
+
+    console.log(newContextData);
+
     try {
-      await generatePlan(contextData, input);
+      setLoading(true);
+      const response: PlanResponseType = await generatePlan(
+        newContextData,
+        input,
+      );
+      console.log(response);
+      setLoading(false);
     } catch (err) {
+      setLoading(false);
       console.log(err);
     }
   };
 
   return (
-    <div className="p-5 w-full bg-transparent h-full flex items-center justify-center">
+    <div className="p-5 w-full bg-transparent relative h-full flex items-center justify-center">
+      {loading && (
+        <div className="backdrop-blur-md flex items-center justify-center absolute inset-0 z-20">
+          <GridLoader color="#ff4d00" />
+        </div>
+      )}
       <div
         className="flex flex-col gap-y-4 w-full h-auto items-center
           justify-center"
@@ -150,8 +168,8 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
           Start Planning
         </span>
 
-        <div className="flex transition-all gap-y-2 duration-75 ease-in-out h-auto relative flex-col">
-          <div className="flex gap-x-2 p-1 rounded-t-lg border-t-1 border-x-1 border-zinc-700">
+        <div className="flex transition-all duration-75 ease-in-out h-auto relative flex-col">
+          <div className="flex gap-1 flex-wrap  p-1 rounded-t-lg border-t-1 border-x-1 border-orange-500 dark:border-zinc-700">
             {contextItems.length > 0 &&
               contextItems.map((item) => (
                 <motion.div
@@ -159,7 +177,7 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
                   animate={{ scale: [0, 1] }}
                   transition={{ ease: "easeInOut" }}
                   style={{ transformOrigin: "top left" }}
-                  className="text-xs text-orange-500 rounded-lg border-1 bg-muted font-semibold 
+                  className="text-xs text-orange-500 rounded-lg  border-1 bg-black dark:bg-muted font-semibold 
                 flex items-center justify-center w-fit gap-x-2 py-2 px-2"
                 >
                   {item}{" "}
@@ -173,19 +191,23 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
                         return updated;
                       });
                     }}
-                    className="cursor-pointer text-foreground"
+                    className="cursor-pointer dark:text-foreground text-white"
                   >
                     x
                   </button>
                 </motion.div>
               ))}{" "}
           </div>
-          <form onSubmit={handleSubmit} className="flex gap-2 flex-col">
+          <form
+            onSubmit={handleSubmit}
+            className="flex gap-2 relative flex-col"
+          >
             <input
               value={input}
+              required
               onChange={handleChange}
               onKeyDown={handleKeyDown}
-              className="py-1.5 bg-muted text-md px-2 focus:outline-1
+              className="py-1.5 bg-zinc-800 text-md px-2 focus:outline-1
               focus:outline-zinc-500 rounded-sm w-full min-w-[400px] self-center
               border-2 border-zinc-700"
             />
@@ -202,10 +224,10 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
                   }}
                   style={{ transformOrigin: "top left" }}
                   className="text-white h-auto bg-muted shadow-lg w-[150px]
-                  absolute rounded-md top-22 left-0"
+                  absolute rounded-md top-12 left-0"
                 >
                   <div
-                    className="bg-muted rounded-md border-2 border-zinc-700 gap-y-1 flex flex-col max-h-40
+                    className="bg-muted rounded-md border-2 dark:border-zinc-700 border-orange-500 gap-y-1 flex flex-col max-h-40
                     overflow-y-auto scrollbar-none"
                   >
                     {suggestionData.map((item, index) => (
