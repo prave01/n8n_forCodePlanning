@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { InputGroup } from "@/components/Molecules/InputGroup";
+import { InputGroup } from '@/components/Molecules/InputGroup'
 
 export default function Home() {
   return (
@@ -10,5 +10,5 @@ export default function Home() {
     >
       <InputGroup />
     </div>
-  );
+  )
 }

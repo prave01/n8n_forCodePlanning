@@ -1,55 +1,55 @@
-import { useState, useRef } from "react";
-import { toast } from "sonner";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import ImportSvg from "../SVGs/ImportSvg";
-import { useFileStore } from "@/app/store/useFileStore";
-import { redirect } from "next/navigation";
+import { useState, useRef } from 'react'
+import { toast } from 'sonner'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import ImportSvg from '../SVGs/ImportSvg'
+import { useFileStore } from '@/app/store/useFileStore'
+import { redirect } from 'next/navigation'
 
 export const InputGroup = () => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [githubUrl, setGithubUrl] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [githubUrl, setGithubUrl] = useState<string>('')
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-  const setArrayBuffer = useFileStore((s) => s.setArrayBuffer);
+  const setArrayBuffer = useFileStore((s) => s.setArrayBuffer)
 
   const handleSubmit = (e: any) => {
-    e.preventDefault();
-    if (isGitHubUrl(githubUrl)) return toast.success("Processing");
-    toast.error("Invalid github repo link");
-  };
+    e.preventDefault()
+    if (isGitHubUrl(githubUrl)) return toast.success('Processing')
+    toast.error('Invalid github repo link')
+  }
 
   const isGitHubUrl = (url: string) => {
     const githubRegex =
-      /^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(\.git)?\/?$/i;
-    return githubRegex.test(url);
-  };
+      /^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(\.git)?\/?$/i
+    return githubRegex.test(url)
+  }
 
   const handleFileChange = async (e: any) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const file = e.target.files[0]
+    if (!file) return
 
-    if (file.name.split(".").pop() === "zip") {
-      setSelectedFile(file);
-      toast.success("File Imported Successfully");
-      return;
+    if (file.name.split('.').pop() === 'zip') {
+      setSelectedFile(file)
+      toast.success('File Imported Successfully')
+      return
     }
-    toast.error("Unsupported File Type");
-  };
+    toast.error('Unsupported File Type')
+  }
 
   const handleFileSubmit = async () => {
-    const Buffer = await selectedFile?.arrayBuffer();
-    if (!Buffer) return;
-    setArrayBuffer(Buffer);
-    redirect("/prePlan/startPlan");
-  };
+    const Buffer = await selectedFile?.arrayBuffer()
+    if (!Buffer) return
+    setArrayBuffer(Buffer)
+    redirect('/prePlan/startPlan')
+  }
 
   const removeFile = () => {
-    setSelectedFile(null);
+    setSelectedFile(null)
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = ''
     }
-  };
+  }
 
   return (
     <div
@@ -69,20 +69,20 @@ export const InputGroup = () => {
               className="z-10 absolute text-xs"
             />
 
-            <label
-              htmlFor="file"
-              className=" "
-            >
+            <label htmlFor="file" className="">
               <div
                 onClick={handleFileSubmit}
-                className="cursor-pointer p-2 dark:bg-black 
-                bg-zinc-200 rounded-lg">
-                <ImportSvg className="dark:stroke-zinc-400 stroke-black size-[18px]" />
+                className="cursor-pointer p-2 dark:bg-black bg-zinc-200
+                  rounded-lg"
+              >
+                <ImportSvg
+                  className="dark:stroke-zinc-400 stroke-black size-[18px]"
+                />
               </div>
             </label>
             <Button
               onClick={handleFileSubmit}
-              size={"icon-sm"}
+              size={'icon-sm'}
               disabled={selectedFile ? false : true}
               className="text-xs rounded-md dark:hover:bg-black
                 dark:hover:text-white cursor-pointer"
@@ -114,9 +114,9 @@ export const InputGroup = () => {
         className="text-[12px] space-y-2 w-full tracking-tight leading-5 h-auto
           text-center"
       >
-        Import the project as{" "}
-        <span className="text-orange-500 font-semibold">Zip file</span> or{" "}
-        <br /> Paste the{" "}
+        Import the project as{' '}
+        <span className="text-orange-500 font-semibold">Zip file</span> or{' '}
+        <br /> Paste the{' '}
         <span className="text-orange-500 font-semibold">Github URL</span> of the
         repo here
       </div>
@@ -140,5 +140,5 @@ export const InputGroup = () => {
         </Button>
       </form>
     </div>
-  );
-};
+  )
+}

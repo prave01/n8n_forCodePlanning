@@ -16,7 +16,10 @@ export function FileTreeView({
   const [selectedPath, setSelectedPath] = useState<string>("");
 
   return (
-    <div className="font-mono dark:bg-black child bg-transparent h-full text-sm pl-5 pt-5 space-y-1">
+    <div
+      className="font-mono dark:bg-black child bg-transparent h-full text-sm
+        pl-5 pt-5 space-y-1"
+    >
       {Object.entries(data).map(([key, value]) => (
         <TreeNode
           key={key}
@@ -50,16 +53,17 @@ function TreeNode({
   setSelectedPath: (path: string) => void;
   path: string;
 }) {
-  const [open, setOpen] = useState(false);
-
   const isFolder = value && typeof value === "object" && !("data" in value);
+  const [open, setOpen] = useState(level === 0); // ✅ default open if level 0
   const isSelected = selectedPath === path;
 
   const handleClick = () => {
     if (isFolder) {
+      // ✅ Prevent toggling for level 0 folders (keep always open)
+      if (level === 0) return;
       setOpen((o) => !o);
     } else {
-      setCurrData({ data: value.data, name: name });
+      setCurrData({ data: value.data, name });
       setSelectedPath(path);
     }
   };
@@ -92,16 +96,13 @@ function TreeNode({
           <File size={14} className="mr-1 text-zinc-500" />
         )}
         {isFolder && <Folder size={14} className="mr-1 text-yellow-500" />}
-        <span className="">{name}</span>
+        <span>{name}</span>
       </Button>
 
       {isFolder && open && (
         <motion.div
           animate={{ opacity: [0, 1] }}
-          transition={{
-            ease: "easeInOut",
-            duration: 0.3,
-          }}
+          transition={{ ease: "easeInOut", duration: 0.3 }}
           className="border-l border-zinc-700 pl-2 mt-1"
         >
           {Object.entries(value).map(([childName, childValue]) => (
