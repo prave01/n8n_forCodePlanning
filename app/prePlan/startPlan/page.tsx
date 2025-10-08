@@ -34,12 +34,9 @@ export default function Page() {
   if (!tree) return <div className="text-center text-sm mt-10">Loading...</div>;
 
   return (
-    <div
-      className="flex gap-5 items-center justify-center w-full h-full
-        min-h-screen"
-    >
+    <div className="flex gap-5 items-center overflow-hidden relative justify-center w-full h-full min-h-screen">
       <ResizablePanelGroup direction={"horizontal"}>
-        <ResizablePanel defaultSize={25}>
+        <ResizablePanel className="bg-transparent" defaultSize={40}>
           <Plan tree={tree} />
         </ResizablePanel>
         <ResizableHandle />

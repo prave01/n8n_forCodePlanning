@@ -17,7 +17,7 @@ export function FileTreeView({
 
   return (
     <div
-      className="font-mono dark:bg-black child bg-transparent h-full text-sm
+      className="font-mono dark:bg-black bg-zinc-100 child h-full text-sm
         pl-5 pt-5 space-y-1"
     >
       {Object.entries(data).map(([key, value]) => (

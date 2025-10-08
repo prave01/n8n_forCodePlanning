@@ -18,28 +18,6 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
 
   const suggestionRefs = useRef<Array<HTMLDivElement | null>>([]);
 
-  // useEffect(() => {
-  //   if (!tree || typeof tree !== "object") return;
-  //
-  //   const traverse = (node: Record<string, any>, prefix = "") => {
-  //     Object.entries(node).forEach(([name, value]) => {
-  //       const isObject = value && typeof value === "object";
-  //       const isFile = isObject && "data" in value;
-  //
-  //       if (isFile) {
-  //         suggestions.push(name);
-  //       } else if (isObject) {
-  //         const nextPrefix = prefix ? `${prefix}/${name}` : name;
-  //         traverse(value as Record<string, any>, nextPrefix);
-  //       }
-  //     });
-  //   };
-  //   traverse(tree);
-  //   setSuggestionData(suggestions.length > 0 ? suggestions : ["No data"]);
-  // }, [tree]);
-  //
-  //
-
   const traverse = (tree: Record<string, any>, results: string[] = []) => {
     Object.entries(tree).forEach(([key, value]) => {
       const isFolder = value && typeof value === "object" && !("data" in value);
@@ -64,6 +42,10 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
         setAllSuggestions(all);
         baseSuggestions = all;
       }
+
+      baseSuggestions = baseSuggestions.filter(
+        (s) => !contextItems.includes(s),
+      );
 
       if (splitWord === "") {
         setSuggestionData(
@@ -95,7 +77,10 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
       );
     } else if (e.key === "Enter") {
       e.preventDefault();
-      setContextItems((prev) => [...prev, suggestionData[activeIndex]]);
+      const dupCheck = contextItems.filter(
+        (i) => i !== suggestionData[activeIndex],
+      );
+      setContextItems(() => [...dupCheck, suggestionData[activeIndex]]);
       setInput("");
       setOpenSuggession(false);
     }
@@ -111,23 +96,24 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
   }, [activeIndex, openSuggession]);
 
   return (
-    <div className="p-5 w-full h-full flex items-center justify-center">
+    <div className="p-5 w-full bg-transparent h-full flex items-center justify-center">
       <div
         className="flex flex-col gap-y-4 w-full h-auto items-center
           justify-center"
       >
-        <span className={cn(bitCount.className, "text-4xl text-orange-500")}>
+        <span className={cn(bitCount.className, "text-5xl text-orange-500")}>
           Start Planning
         </span>
 
         <div className="flex transition-all gap-y-2 duration-75 ease-in-out h-auto relative flex-col">
-          <div className="flex gap-x-2">
+          <div className="flex gap-x-2 h-8">
             {contextItems.length > 0 &&
-              contextItems.map((item, idx) => (
+              contextItems.map((item) => (
                 <motion.div
                   key={item}
                   animate={{ scale: [0, 1] }}
-                  transition={{ type: "spring", ease: "easeInOut" }}
+                  transition={{ ease: "easeInOut" }}
+                  style={{ transformOrigin: "top left" }}
                   className="text-xs text-orange-500 rounded-lg border-1 bg-muted font-semibold 
                 flex items-center justify-center w-fit gap-x-2 py-2 px-2"
                 >
@@ -164,11 +150,11 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
                   type: "spring",
                 }}
                 style={{ transformOrigin: "top left" }}
-                className="text-white h-auto translate-y-12 bg-muted w-[150px]
-                  absolute rounded-md top-0 left-0"
+                className="text-white h-auto bg-muted shadow-lg w-[150px]
+                  absolute rounded-md top-22 left-0"
               >
                 <div
-                  className="bg-muted rounded-md gap-y-1 flex flex-col max-h-40
+                  className="bg-muted rounded-md border-2 border-zinc-700 gap-y-1 flex flex-col max-h-40
                     overflow-y-auto scrollbar-none"
                 >
                   {suggestionData.map((item, index) => (
@@ -178,7 +164,7 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
                         suggestionRefs.current[index] = el;
                       }}
                       className={cn(
-                        "px-3 py-2 cursor-pointer text-sm",
+                        "px-3 py-2 cursor-pointer text-sm dark:text-white text-black",
                         index === activeIndex && "bg-orange-500",
                       )}
                       onMouseEnter={() => setActiveIndex(index)}
