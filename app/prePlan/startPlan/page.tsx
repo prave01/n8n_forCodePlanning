@@ -1,9 +1,9 @@
 "use client";
 
-import { useFileStore } from "@/app/store/useFileStore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { parseZip, buildTree } from "../../../app/actions";
+import { useFileStore } from "@/app/store/useFileStore";
+import { parseZip, buildTree } from "@/lib/utils";
 import {
   ResizableHandle,
   ResizablePanel,

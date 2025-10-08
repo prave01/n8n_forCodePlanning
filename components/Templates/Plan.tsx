@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Bitcount_Prop_Double } from "next/font/google";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { toast } from "sonner";
+import { generatePlan } from "@/app/actions";
 
 const bitCount = Bitcount_Prop_Double({
   subsets: ["latin"],
@@ -15,6 +17,7 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
   const [suggestionData, setSuggestionData] = useState<string[]>(["No data"]);
   const [contextItems, setContextItems] = useState<Array<string>>([]);
   const [allSuggestions, setAllSuggestions] = useState<Array<string>>([]);
+  const [contextData, setContextData] = useState<Record<string, string>>();
 
   const suggestionRefs = useRef<Array<HTMLDivElement | null>>([]);
 
@@ -95,6 +98,48 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
     }
   }, [activeIndex, openSuggession]);
 
+  function findDataByKey(
+    tree: Record<string, any>,
+    key: string,
+  ): string | null {
+    for (const [k, value] of Object.entries(tree)) {
+      const isFolder = value && typeof value === "object" && !("data" in value);
+
+      if (k === key && !isFolder) {
+        return value.data;
+      }
+
+      if (isFolder) {
+        const result = findDataByKey(value, key);
+        if (result !== null) return result;
+      }
+    }
+    return null;
+  }
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    if (contextItems.length === 0) {
+      toast.error("Please add some context");
+      return;
+    }
+    contextItems.forEach((i) => {
+      const data = findDataByKey(tree, i);
+      setContextData((prev) => ({
+        ...prev,
+        [i]: data as string,
+      }));
+    });
+
+    // generate plan
+    if (!contextData) return toast.error("No context added");
+    try {
+      await generatePlan(contextData, input);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="p-5 w-full bg-transparent h-full flex items-center justify-center">
       <div
@@ -106,7 +151,7 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
         </span>
 
         <div className="flex transition-all gap-y-2 duration-75 ease-in-out h-auto relative flex-col">
-          <div className="flex gap-x-2 h-8">
+          <div className="flex gap-x-2 p-1 rounded-t-lg border-t-1 border-x-1 border-zinc-700">
             {contextItems.length > 0 &&
               contextItems.map((item) => (
                 <motion.div
@@ -122,6 +167,11 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
                     type="button"
                     onClick={() => {
                       setContextItems(contextItems.filter((i) => i !== item));
+                      setContextData((prev) => {
+                        const updated = { ...prev };
+                        delete updated[item];
+                        return updated;
+                      });
                     }}
                     className="cursor-pointer text-foreground"
                   >
@@ -130,62 +180,68 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
                 </motion.div>
               ))}{" "}
           </div>
-          <input
-            value={input}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            className="py-1.5 bg-muted text-md px-2 focus:outline-1
+          <form onSubmit={handleSubmit} className="flex gap-2 flex-col">
+            <input
+              value={input}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              className="py-1.5 bg-muted text-md px-2 focus:outline-1
               focus:outline-zinc-500 rounded-sm w-full min-w-[400px] self-center
               border-2 border-zinc-700"
-          />
-          <AnimatePresence>
-            {openSuggession && (
-              <motion.div
-                initial={{ scale: 0, opacity: 0, filter: "blur(10px)" }}
-                animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-                exit={{ scale: 0, opacity: 0, filter: "blur(10px)" }}
-                transition={{
-                  duration: 0.3,
-                  ease: "easeInOut",
-                  type: "spring",
-                }}
-                style={{ transformOrigin: "top left" }}
-                className="text-white h-auto bg-muted shadow-lg w-[150px]
+            />
+            <AnimatePresence>
+              {openSuggession && (
+                <motion.div
+                  initial={{ scale: 0, opacity: 0, filter: "blur(10px)" }}
+                  animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+                  exit={{ scale: 0, opacity: 0, filter: "blur(10px)" }}
+                  transition={{
+                    duration: 0.3,
+                    ease: "easeInOut",
+                    type: "spring",
+                  }}
+                  style={{ transformOrigin: "top left" }}
+                  className="text-white h-auto bg-muted shadow-lg w-[150px]
                   absolute rounded-md top-22 left-0"
-              >
-                <div
-                  className="bg-muted rounded-md border-2 border-zinc-700 gap-y-1 flex flex-col max-h-40
-                    overflow-y-auto scrollbar-none"
                 >
-                  {suggestionData.map((item, index) => (
-                    <div
-                      key={index}
-                      ref={(el) => {
-                        suggestionRefs.current[index] = el;
-                      }}
-                      className={cn(
-                        "px-3 py-2 cursor-pointer text-sm dark:text-white text-black",
-                        index === activeIndex && "bg-orange-500",
-                      )}
-                      onMouseEnter={() => setActiveIndex(index)}
-                      onClick={() => {
-                        setContextItems((prev) => [
-                          ...prev,
-                          suggestionData[activeIndex],
-                        ]);
-                        setOpenSuggession(false);
-                      }}
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <div
+                    className="bg-muted rounded-md border-2 border-zinc-700 gap-y-1 flex flex-col max-h-40
+                    overflow-y-auto scrollbar-none"
+                  >
+                    {suggestionData.map((item, index) => (
+                      <div
+                        key={index}
+                        ref={(el) => {
+                          suggestionRefs.current[index] = el;
+                        }}
+                        className={cn(
+                          "px-3 py-2 cursor-pointer text-sm dark:text-white text-black",
+                          index === activeIndex && "bg-orange-500",
+                        )}
+                        onMouseEnter={() => setActiveIndex(index)}
+                        onClick={() => {
+                          setContextItems((prev) => [
+                            ...prev,
+                            suggestionData[activeIndex],
+                          ]);
+                          setOpenSuggession(false);
+                        }}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <Button
+              type="submit"
+              className="w-[25%] mx-auto bg-orange-500 cursor-pointer"
+            >
+              Plan
+            </Button>
+          </form>
         </div>
-
-        <Button className="w-[25%] bg-orange-500 cursor-pointer">Plan</Button>
       </div>
     </div>
   );
