@@ -5,7 +5,7 @@ import { Bitcount_Prop_Double } from "next/font/google";
 import { useEffect, useRef, useState } from "react";
 import GridLoader from "react-spinners/GridLoader";
 import { toast } from "sonner";
-import { generatePlan } from "@/app/actions/PlannerAI";
+import { generatePlan } from "@/actions/PlannerAI";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import "@xyflow/react/dist/style.css";

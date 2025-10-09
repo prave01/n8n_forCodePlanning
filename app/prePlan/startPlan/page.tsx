@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useFileStore } from "@/app/store/useFileStore";
-import { parseZip, buildTree } from "@/lib/utils";
+import { useFileStore } from "@/store/useFileStore";
+import { buildTree } from "@/lib/utils";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -15,23 +15,19 @@ import { GridLoader } from "react-spinners";
 
 export default function Page() {
   const router = useRouter();
-  const buffer = useFileStore((s) => s.arrayBuffer);
+  const fileData = useFileStore((s) => s.fileData);
   const [tree, setTree] = useState<any>(null);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (!buffer) {
+    if (!fileData || Object.keys(fileData).length === 0) {
       router.push("/");
       return;
     }
 
-    (async () => {
-      const files = await parseZip(buffer);
-      console.log(files);
-      const treeData = buildTree(files);
-      setTree(treeData);
-    })();
-  }, [buffer, router]);
+    const treeData = buildTree(fileData);
+    setTree(treeData);
+  }, [fileData, router]);
 
   useEffect(() => {
     setIsClient(true);
@@ -41,7 +37,6 @@ export default function Page() {
     if (!isClient)
       return (
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* optional static fallback while waiting for hydration */}
           <div className="w-6 h-6 bg-orange-500 rounded-full animate-pulse" />
         </div>
       );

@@ -2,7 +2,7 @@
 
 import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod.mjs";
-import { Plan_ResponseFormat } from "../zodSchema";
+import { Plan_ResponseFormat } from "../app/zodSchema";
 
 const API_KEY = process.env.GEMINI_API_KEY || null;
 

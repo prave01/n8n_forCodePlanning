@@ -1,5 +1,5 @@
 import { Handle, Position } from "@xyflow/react";
-import ExecuteAI from "@/app/actions/ExecutionAI";
+import ExecuteAI from "@/actions/ExecutionAI";
 import type { PlanCardExtendedType } from "@/app/types";
 import {
   Card,
@@ -11,6 +11,9 @@ import {
 } from "../ui/card";
 import { GridLoader } from "react-spinners";
 import { useState } from "react";
+import { replaceData } from "@/lib/utils";
+import { useFileStore } from "@/store/useFileStore";
+import { toast } from "sonner";
 
 const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
   const [loading, setLoading] = useState(false);
@@ -19,9 +22,17 @@ const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
       id: number;
       status: "ok" | null;
       statusData: string;
+      targetFile: string;
       time: string;
     }>
   >([]);
+
+  const [cardState, setCardState] = useState<"ready" | "done" | "error">(
+    "ready",
+  );
+
+  const fileData = useFileStore((s) => s.fileData);
+  const setFileData = useFileStore((s) => s.setFileData);
 
   const {
     planName,
@@ -62,19 +73,23 @@ const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
           id: prev.length > 0 ? prev[prev.length - 1].id + 1 : 1,
           status: "ok",
           statusData: response?.code || "No data",
-          time: getFormattedTime(), // ✅ record time
+          targetFile: targetFile,
+          time: getFormattedTime(),
         },
       ]);
+      setCardState("done");
       console.log("CodeResponse", targetFile, "\n", response);
     } catch (err: any) {
       setLoading(false);
+      setCardState("error");
       setExecutionState((prev) => [
         ...prev,
         {
           id: prev.length > 0 ? prev[prev.length - 1].id + 1 : 1,
           status: null,
           statusData: err?.message || String(err),
-          time: getFormattedTime(), // ✅ record time even on failure
+          targetFile: targetFile,
+          time: getFormattedTime(),
         },
       ]);
       console.error(err);
@@ -93,13 +108,35 @@ const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
           </div>
         )}
 
-        <div
-          className="absolute inset-0 -z-20"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(249, 115, 22, 0.25), transparent 70%), #000000",
-          }}
-        />
+        {cardState === "ready" && (
+          <div
+            className="absolute inset-0 -z-20"
+            style={{
+              background:
+                "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(249, 115, 22, 0.25), transparent 70%), #000000",
+            }}
+          />
+        )}
+
+        {cardState === "error" && (
+          <div
+            className="absolute inset-0 -z-20"
+            style={{
+              background:
+                "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(236, 72, 153, 0.25), transparent 70%), #000000",
+            }}
+          />
+        )}
+
+        {cardState === "done" && (
+          <div
+            className="absolute inset-0 -z-20"
+            style={{
+              background:
+                "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(34, 197, 94, 0.25), transparent 70%), #000000",
+            }}
+          />
+        )}
 
         <CardHeader className="p-2 w-full flex flex-row gap-x-4 items-center justify-between">
           <CardTitle className="text-sm max-w-[200px] text-orange-500 w-fit font-semibold">
@@ -165,9 +202,25 @@ const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
                     {item.status === "ok" ? (
                       <div className="gap-x-2 flex items-center justify-center">
                         <span className="text-zinc-400">{item.time}</span>
-                        <div className="px-2 py-1 rounded-md text-green-200 bg-green-500/50 cursor-pointer">
-                          See data
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newFilesData = replaceData(
+                              fileData,
+                              executionState[idx].statusData,
+                              executionState[idx].targetFile,
+                            );
+                            if (newFilesData) {
+                              setFileData(newFilesData);
+                              toast.success("Data updated successfully");
+                              return;
+                            }
+                            toast.error("Cannot update the data");
+                          }}
+                          className="px-2 py-1 rounded-md text-green-200 bg-green-500/50 cursor-pointer"
+                        >
+                          Set data
+                        </button>
                       </div>
                     ) : (
                       <div className="gap-x-2 flex items-center justify-center">

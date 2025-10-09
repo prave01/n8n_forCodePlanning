@@ -1,19 +1,19 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { ChevronDown, ChevronRight, File, Folder } from 'lucide-react'
-import { Button } from '../ui/button'
-import { cn } from '@/lib/utils'
-import { motion } from 'motion/react'
+import { useState } from "react";
+import { ChevronDown, ChevronRight, File, Folder } from "lucide-react";
+import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 
 export function FileTreeView({
   data,
   setCurrData,
 }: {
-  data: any
-  setCurrData: ({ data, name }: { data: string; name: string }) => void
+  data: any;
+  setCurrData: ({ data, name }: { data: string; name: string }) => void;
 }) {
-  const [selectedPath, setSelectedPath] = useState<string>('')
+  const [selectedPath, setSelectedPath] = useState<string>("");
 
   return (
     <div
@@ -33,7 +33,7 @@ export function FileTreeView({
         />
       ))}
     </div>
-  )
+  );
 }
 
 function TreeNode({
@@ -45,28 +45,27 @@ function TreeNode({
   setSelectedPath,
   path,
 }: {
-  name: string
-  value: any
-  level: number
-  setCurrData: ({ data, name }: { data: string; name: string }) => void
-  selectedPath: string
-  setSelectedPath: (path: string) => void
-  path: string
+  name: string;
+  value: any;
+  level: number;
+  setCurrData: ({ data, name }: { data: string; name: string }) => void;
+  selectedPath: string;
+  setSelectedPath: (path: string) => void;
+  path: string;
 }) {
-  const isFolder = value && typeof value === 'object' && !('data' in value)
-  const [open, setOpen] = useState(level === 0) // ✅ default open if level 0
-  const isSelected = selectedPath === path
+  const isFolder = value && typeof value === "object" && !("data" in value);
+  const [open, setOpen] = useState(level === 0);
+  const isSelected = selectedPath === path;
 
   const handleClick = () => {
     if (isFolder) {
-      // ✅ Prevent toggling for level 0 folders (keep always open)
-      if (level === 0) return
-      setOpen((o) => !o)
+      if (level === 0) return;
+      setOpen((o) => !o);
     } else {
-      setCurrData({ data: value.data, name })
-      setSelectedPath(path)
+      setCurrData({ data: value.data, name });
+      setSelectedPath(path);
     }
-  }
+  };
 
   return (
     <div className="w-full h-full" style={{ marginLeft: `${level * 12}px` }}>
@@ -75,15 +74,15 @@ function TreeNode({
         tabIndex={0}
         onClick={handleClick}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            handleClick()
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleClick();
           }
         }}
         className={cn(
-          'flex items-center justify-start mr-10 cursor-pointer select-none',
-          'hover:bg-muted rounded-md px-2 py-1 w-auto transition-colors',
-          isSelected && 'bg-foreground dark:bg-muted text-orange-500'
+          "flex items-center justify-start mr-10 cursor-pointer select-none",
+          "hover:bg-muted rounded-md px-2 py-1 w-auto transition-colors",
+          isSelected && "bg-foreground dark:bg-muted text-orange-500",
         )}
       >
         {isFolder ? (
@@ -102,7 +101,7 @@ function TreeNode({
       {isFolder && open && (
         <motion.div
           animate={{ opacity: [0, 1] }}
-          transition={{ ease: 'easeInOut', duration: 0.3 }}
+          transition={{ ease: "easeInOut", duration: 0.3 }}
           className="border-l border-zinc-700 pl-2 mt-1"
         >
           {Object.entries(value).map(([childName, childValue]) => (
@@ -120,5 +119,5 @@ function TreeNode({
         </motion.div>
       )}
     </div>
-  )
+  );
 }
