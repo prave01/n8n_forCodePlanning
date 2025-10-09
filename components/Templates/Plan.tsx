@@ -1,19 +1,20 @@
+"use client";
+
+import { AnimatePresence, motion } from "motion/react";
+import { Bitcount_Prop_Double } from "next/font/google";
+import { useEffect, useRef, useState } from "react";
+import GridLoader from "react-spinners/GridLoader";
+import { toast } from "sonner";
+import { generatePlan } from "@/app/actions/PlannerAI";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
-import { Bitcount_Prop_Double } from "next/font/google";
-import { useState, useRef, useEffect, ReactNode } from "react";
-import { AnimatePresence, motion, useAnimation } from "motion/react";
-import { toast } from "sonner";
-import { generatePlan } from "@/app/actions";
-import { z } from "zod";
-import { Plan_ResponseFormat } from "@/app/zodSchema";
-import GridLoader from "react-spinners/GridLoader";
+import "@xyflow/react/dist/style.css";
+import type { Plan_ResponseType } from "@/app/types";
+import { PlannerFlow } from "../Pages/PlannerFlow";
 
 const bitCount = Bitcount_Prop_Double({
   subsets: ["latin"],
 });
-
-type PlanResponseType = z.infer<typeof Plan_ResponseFormat>;
 
 function findDataByKey(tree: Record<string, any>, key: string): string | null {
   for (const [k, value] of Object.entries(tree)) {
@@ -47,8 +48,9 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
   const [suggestionData, setSuggestionData] = useState<string[]>(["No data"]);
   const [contextItems, setContextItems] = useState<Array<string>>([]);
   const [allSuggestions, setAllSuggestions] = useState<Array<string>>([]);
-  const [contextData, setContextData] = useState<Record<string, string>>();
   const [loading, setLoading] = useState(false);
+  const [plan, setPlan] = useState<Plan_ResponseType>();
+  const [contextData, setContextData] = useState<Record<string, string>>({});
 
   const suggestionRefs = useRef<Array<HTMLDivElement | null>>([]);
 
@@ -137,15 +139,15 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
       return toast.error("No context added");
     }
 
-    console.log(newContextData);
+    setContextData(newContextData);
 
     try {
       setLoading(true);
-      const response: PlanResponseType = await generatePlan(
+      const response: Plan_ResponseType = await generatePlan(
         newContextData,
         input,
       );
-      console.log(response);
+      setPlan(response);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -153,10 +155,20 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
     }
   };
 
+  if (plan) {
+    return <PlannerFlow contextData={contextData} AI_Response={plan} />;
+  }
+
   return (
-    <div className="p-5 w-full bg-transparent relative h-full flex items-center justify-center">
+    <div
+      className="p-5 w-full bg-transparent relative h-full flex items-center
+        justify-center"
+    >
       {loading && (
-        <div className="backdrop-blur-md flex items-center justify-center absolute inset-0 z-20">
+        <div
+          className="backdrop-blur-md flex items-center justify-center absolute
+            inset-0 z-20"
+        >
           <GridLoader color="#ff4d00" />
         </div>
       )}
@@ -168,8 +180,14 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
           Start Planning
         </span>
 
-        <div className="flex transition-all duration-75 ease-in-out h-auto relative flex-col">
-          <div className="flex gap-1 flex-wrap  p-1 rounded-t-lg border-t-1 border-x-1 border-orange-500 dark:border-zinc-700">
+        <div
+          className="flex transition-all duration-75 ease-in-out h-auto relative
+            flex-col"
+        >
+          <div
+            className="flex gap-1 flex-wrap p-1 rounded-t-lg border-t-1
+              border-x-1 border-orange-500 dark:border-zinc-700"
+          >
             {contextItems.length > 0 &&
               contextItems.map((item) => (
                 <motion.div
@@ -177,19 +195,15 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
                   animate={{ scale: [0, 1] }}
                   transition={{ ease: "easeInOut" }}
                   style={{ transformOrigin: "top left" }}
-                  className="text-xs text-orange-500 rounded-lg  border-1 bg-black dark:bg-muted font-semibold 
-                flex items-center justify-center w-fit gap-x-2 py-2 px-2"
+                  className="text-xs text-orange-500 rounded-lg border-1
+                    bg-black dark:bg-muted font-semibold flex items-center
+                    justify-center w-fit gap-x-2 py-2 px-2"
                 >
                   {item}{" "}
                   <button
                     type="button"
                     onClick={() => {
                       setContextItems(contextItems.filter((i) => i !== item));
-                      setContextData((prev) => {
-                        const updated = { ...prev };
-                        delete updated[item];
-                        return updated;
-                      });
                     }}
                     className="cursor-pointer dark:text-foreground text-white"
                   >
@@ -208,8 +222,8 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
               onChange={handleChange}
               onKeyDown={handleKeyDown}
               className="py-1.5 bg-zinc-800 text-md px-2 focus:outline-1
-              focus:outline-zinc-500 rounded-sm w-full min-w-[400px] self-center
-              border-2 border-zinc-700"
+                focus:outline-zinc-500 rounded-sm w-full min-w-[400px]
+                self-center border-2 border-zinc-700"
             />
             <AnimatePresence>
               {openSuggession && (
@@ -224,20 +238,22 @@ export const Plan = ({ tree }: { tree: Record<string, any> }) => {
                   }}
                   style={{ transformOrigin: "top left" }}
                   className="text-white h-auto bg-muted shadow-lg w-[150px]
-                  absolute rounded-md top-12 left-0"
+                    absolute rounded-md top-12 left-0"
                 >
                   <div
-                    className="bg-muted rounded-md border-2 dark:border-zinc-700 border-orange-500 gap-y-1 flex flex-col max-h-40
-                    overflow-y-auto scrollbar-none"
+                    className="bg-muted rounded-md border-2 dark:border-zinc-700
+                      border-orange-500 gap-y-1 flex flex-col max-h-40
+                      overflow-y-auto scrollbar-none"
                   >
                     {suggestionData.map((item, index) => (
                       <div
-                        key={index}
+                        key={item}
                         ref={(el) => {
                           suggestionRefs.current[index] = el;
                         }}
                         className={cn(
-                          "px-3 py-2 cursor-pointer text-sm dark:text-white text-black",
+                          `px-3 py-2 cursor-pointer text-sm dark:text-white
+                          text-black`,
                           index === activeIndex && "bg-orange-500",
                         )}
                         onMouseEnter={() => setActiveIndex(index)}

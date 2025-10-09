@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+  devIndicators: {
+    position: "top-right",
+  },
 };
 
 export default nextConfig;

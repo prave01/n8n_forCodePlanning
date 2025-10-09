@@ -1,10 +1,16 @@
 import { z } from "zod";
 
-export const Plan_ResponseFormat = z.array(
-  z.object({
-    planName: z.string(),
-    targetFile: z.string(),
-    description: z.string(),
-    plan_prompt: z.string(),
-  }),
-);
+const IndividualPlan = z.object({
+  planName: z.string(),
+  targetFile: z.string(),
+  planDescription: z.array(z.string()),
+  planPrompt: z.string(),
+});
+
+const Plan_ResponseFormat = z.array(IndividualPlan);
+
+const Execute_ResponseFormat = z.object({
+  code: z.string(),
+});
+
+export { IndividualPlan, Plan_ResponseFormat, Execute_ResponseFormat };
