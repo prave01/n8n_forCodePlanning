@@ -64,3 +64,31 @@ export function replaceData(
 
   return updatedFiles;
 }
+
+export const traverse = (tree: Record<string, any>, results: string[] = []) => {
+  Object.entries(tree).forEach(([key, value]) => {
+    const isFolder = value && typeof value === "object" && !("data" in value);
+    if (isFolder) traverse(value, results);
+    else results.push(key);
+  });
+  return results;
+};
+
+export function findDataByKey(
+  tree: Record<string, any>,
+  key: string,
+): string | null {
+  for (const [k, value] of Object.entries(tree)) {
+    const isFolder = value && typeof value === "object" && !("data" in value);
+
+    if (k === key && !isFolder) {
+      return value.data;
+    }
+
+    if (isFolder) {
+      const result = findDataByKey(value, key);
+      if (result !== null) return result;
+    }
+  }
+  return null;
+}

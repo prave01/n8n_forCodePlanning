@@ -11,24 +11,30 @@ import {
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
-import { useCallback, useEffect } from "react";
-import type { Plan_ResponseType } from "@/app/types";
+import { useCallback, useEffect, useState } from "react";
 import PlanCard from "../Atoms/PlanCard";
 import CustomEdge from "../ReactFlow/CustomEdge";
-import { useRunConnectedNodes } from "@/store/store";
+import { useContextData, usePlan, useRunConnectedNodes } from "@/store/store";
+import { Button } from "../ui/button";
+import { PlanInput } from "../Atoms/PlanInput";
+import { GridLoader } from "react-spinners";
+import { motion } from "motion/react";
 
-export const PlannerFlow = ({
-  contextData,
-  AI_Response,
-}: {
-  contextData: Record<string, string>;
-  AI_Response: Plan_ResponseType;
-}) => {
+export const PlannerFlow = ({ tree }: { tree: Record<string, any> }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
+  const [open, setOpen] = useState(false);
+
+  const [isLoading, setLoading] = useState(false);
+
+  const AI_Response = usePlan((s) => s.plan);
+  const contextData = useContextData((s) => s.contextData);
 
   useEffect(() => {
     if (!AI_Response || AI_Response.length === 0) return;
+
+    console.log("Plan", AI_Response);
+    console.log("Context", contextData);
 
     const generatedNodes: Node[] = AI_Response.map((plan, index) => ({
       id: `n${index + 1}`,
@@ -87,7 +93,33 @@ export const PlannerFlow = ({
         fitView
         className="bg-transparent text-black"
       >
-        <div className="absolute top-3 right-3 size-10 bg-white"></div>
+        <Button
+          onClick={() => setOpen(!open)}
+          className="absolute top-3 z-40 hover:bg-black hover:border-1 border-zinc-700 cursor-pointer right-3 flex items-center justify-center size-10 bg-zinc-800 rounded-full text-2xl text-zinc-200"
+        >
+          +
+        </Button>
+
+        {open && (
+          <motion.div
+            animate={{ scale: [0, 1] }}
+            transition={{ ease: "easeInOut", duration: 0.2 }}
+            style={{ transformOrigin: "top right" }}
+            className="w-md absolute backdrop-blur-md p-2 rounded-lg z-40 right-3 top-16"
+          >
+            <PlanInput setLoading={setLoading} tree={tree} />
+          </motion.div>
+        )}
+
+        {isLoading && (
+          <div
+            className="backdrop-blur-md flex items-center justify-center absolute
+            inset-0 z-20"
+          >
+            <GridLoader color="#ff4d00" />
+          </div>
+        )}
+
         <Background className="bg-transparent text-black" />
         <Controls className="bg-transparent text-black" />
       </ReactFlow>

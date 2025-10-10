@@ -100,7 +100,6 @@ const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
       );
 
       if (!hasOutgoing) {
-        console.log("This is the last node in the chain");
         setRunState({
           nodeId: data.nodeId,
           status: false,
