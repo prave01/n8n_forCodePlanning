@@ -1,12 +1,7 @@
-# Traycer - AI-Powered Code Planning and Execution Platform
+# Traycer Web - AI-Powered Code Planning and Execution Platform
 
-Traycer is a sophisticated web application that leverages artificial intelligence to analyze codebases, generate execution plans, and automate code modifications. The platform provides an intuitive visual interface for managing complex development workflows through an interactive node-based planning system.
-
-## Overview
-
-Traycer transforms the traditional code editing workflow by introducing AI-driven planning capabilities. Users can upload their projects as ZIP files, and the platform intelligently analyzes the codebase to generate actionable execution plans. These plans are presented as interactive nodes that can be connected to create complex workflows, enabling automated code generation and modification.
-
-## Core Features
+#### Demo Video
+https://drive.google.com/file/d/18u3-_oHqUEsq9Fh8xfqnKJutdk0G7Cxu/view?usp=sharing
 
 ### Project Analysis
 
@@ -118,7 +113,7 @@ Centralized state management using Zustand stores:
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/prave01/Traycer_built ./traycer
 cd traycer
 ```
 
@@ -126,12 +121,6 @@ cd traycer
 
 ```bash
 yarn install
-```
-
-3. Set up environment variables:
-
-```bash
-cp .env.example .env.local
 ```
 
 Add your Google Gemini API key:
@@ -182,19 +171,3 @@ The application integrates with Google's Gemini AI through the OpenAI-compatible
 - **Model**: gemini-2.5-flash for fast response times
 - **Response Format**: Structured JSON using Zod schemas
 - **Error Handling**: Comprehensive error management with user feedback
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run quality checks
-5. Submit a pull request
-
-## License
-
-This project is private and proprietary. All rights reserved.
-
-## Support
-
-For technical support or questions, please contact the development team or create an issue in the project repository.
