@@ -1,4 +1,4 @@
-import { useFileStore } from "@/store/useFileStore";
+import { useFileStore } from "@/store/store";
 import { type ClassValue, clsx } from "clsx";
 import { debug } from "console";
 import JSZip from "jszip";

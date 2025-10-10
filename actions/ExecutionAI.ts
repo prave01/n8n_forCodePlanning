@@ -6,7 +6,11 @@ import { Execute_ResponseFormat } from "@/app/zodSchema";
 
 const API_KEY = process.env.GEMINI_API_KEY || null;
 
-const ExecuteAI = async (prompt: string, code: string) => {
+const ExecuteAI = async (
+  prompt: string,
+  code: string,
+  refData?: { fileName: string; code: string },
+) => {
   if (!prompt) return new Error("No input prompt");
 
   const client = new OpenAI({
@@ -21,22 +25,29 @@ const ExecuteAI = async (prompt: string, code: string) => {
         {
           role: "system",
           content: `
-You are an code generator/editorr based on the given user prompt and the data,
+You are an code generator/editor based on the given user prompt and the data,
 you need to generate code and give the output in the format of
 
 --Context:
 Old Code Data : ${JSON.stringify(code)}
 
+${refData?.code &&
+            `
+--Reference Data
+fileName: ${refData?.fileName}
+code: ${refData.code}
+`
+            }
 --Format:
-{
-  code:<string>
+      {
+        code: <string>
 }
 
 --NOTE:
-- No Explanitions, no comments but just a clean code
-- Make sure the generated code is highly realted to the context
-- Don't make any errors in the code
-`,
+      - No Explanitions, no comments but just a clean code
+    - Make sure the generated code is highly realted to the context
+    - Don't make any errors in the code
+      `,
         },
         {
           role: "user",

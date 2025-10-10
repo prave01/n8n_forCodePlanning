@@ -1,28 +1,28 @@
-"use client";
-import React from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { atomDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { IconCheck, IconCopy } from "@tabler/icons-react";
+'use client'
+import React from 'react'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { IconCheck, IconCopy } from '@tabler/icons-react'
 
 type CodeBlockProps = {
-  language: string;
-  filename: string;
-  highlightLines?: number[];
+  language: string
+  filename: string
+  highlightLines?: number[]
 } & (
   | {
-      code: string;
-      tabs?: never;
+      code: string
+      tabs?: never
     }
   | {
-      code?: never;
+      code?: never
       tabs: Array<{
-        name: string;
-        code: string;
-        language?: string;
-        highlightLines?: number[];
-      }>;
+        name: string
+        code: string
+        language?: string
+        highlightLines?: number[]
+      }>
     }
-);
+)
 
 export const CodeBlock = ({
   language,
@@ -31,27 +31,27 @@ export const CodeBlock = ({
   highlightLines = [],
   tabs = [],
 }: CodeBlockProps) => {
-  const [copied, setCopied] = React.useState(false);
-  const [activeTab, setActiveTab] = React.useState(0);
+  const [copied, setCopied] = React.useState(false)
+  const [activeTab, setActiveTab] = React.useState(0)
 
-  const tabsExist = tabs.length > 0;
+  const tabsExist = tabs.length > 0
 
   const copyToClipboard = async () => {
-    const textToCopy = tabsExist ? tabs[activeTab].code : code;
+    const textToCopy = tabsExist ? tabs[activeTab].code : code
     if (textToCopy) {
-      await navigator.clipboard.writeText(textToCopy);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(textToCopy)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     }
-  };
+  }
 
-  const activeCode = tabsExist ? tabs[activeTab].code : code;
+  const activeCode = tabsExist ? tabs[activeTab].code : code
   const activeLanguage = tabsExist
     ? tabs[activeTab].language || language
-    : language;
+    : language
   const activeHighlightLines = tabsExist
     ? tabs[activeTab].highlightLines || []
-    : highlightLines;
+    : highlightLines
 
   return (
     <div
@@ -67,8 +67,8 @@ export const CodeBlock = ({
                 onClick={() => setActiveTab(index)}
                 className={`px-3 !py-2 text-xs transition-colors font-sans ${
                   activeTab === index
-                    ? "text-white"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? 'text-white'
+                    : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 {tab.name}
@@ -95,18 +95,18 @@ export const CodeBlock = ({
         customStyle={{
           margin: 0,
           padding: 0,
-          background: "transparent",
-          fontSize: "0.875rem", // text-sm equivalent
+          background: 'transparent',
+          fontSize: '0.875rem', // text-sm equivalent
         }}
         wrapLines={true}
         showLineNumbers={true}
         lineProps={(lineNumber) => ({
           style: {
             backgroundColor: activeHighlightLines.includes(lineNumber)
-              ? "rgba(255,255,255,0.1)"
-              : "transparent",
-            display: "block",
-            width: "100%",
+              ? 'rgba(255,255,255,0.1)'
+              : 'transparent',
+            display: 'block',
+            width: '100%',
           },
         })}
         PreTag="div"
@@ -114,5 +114,5 @@ export const CodeBlock = ({
         {String(activeCode)}
       </SyntaxHighlighter>
     </div>
-  );
-};
+  )
+}

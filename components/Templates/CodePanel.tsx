@@ -1,23 +1,23 @@
-import { useState } from "react";
-import { FileTreeView } from "../Molecules/FileTree";
-import { CodeBlock } from "../ui/code-block";
+import { useState } from 'react'
+import { FileTreeView } from '../Molecules/FileTree'
+import { CodeBlock } from '../ui/code-block'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from "../ui/resizable";
+} from '../ui/resizable'
 
 export const CodePanel = ({ tree }: { tree: string }) => {
   const [currData, setCurrData] = useState<{
-    data: string;
-    name: string;
-  } | null>(null);
+    data: string
+    name: string
+  } | null>(null)
 
   return (
     <div className="w-full flex h-screen">
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel defaultSize={20} className="overflow-y-scroll">
-          {" "}
+          {' '}
           <div className="overflow-y-scroll h-full parent">
             <FileTreeView setCurrData={setCurrData} data={tree} />
           </div>
@@ -31,7 +31,7 @@ export const CodePanel = ({ tree }: { tree: string }) => {
           >
             {currData && (
               <CodeBlock
-                language={"jsx"}
+                language={'jsx'}
                 filename={currData.name}
                 code={currData.data}
               />
@@ -40,5 +40,5 @@ export const CodePanel = ({ tree }: { tree: string }) => {
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
-  );
-};
+  )
+}

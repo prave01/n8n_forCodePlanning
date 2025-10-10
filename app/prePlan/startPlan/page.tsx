@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useFileStore } from "@/store/useFileStore";
+import { useFileStore } from "@/store/store";
 import { buildTree } from "@/lib/utils";
 import {
   ResizableHandle,

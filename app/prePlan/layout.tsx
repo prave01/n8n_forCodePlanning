@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react'
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen h-full w-full  relative text-white">
+    <div className="min-h-screen h-full w-full relative text-white">
       {/* {/* Circuit Board - Dark Pattern */}
       {/* <div */}
       {/*   className="absolute inset-0 z-0 pointer-events-none" */}
@@ -18,5 +18,5 @@ export default function Layout({ children }: { children: ReactNode }) {
       {/* /> */}
       {children}
     </div>
-  );
+  )
 }

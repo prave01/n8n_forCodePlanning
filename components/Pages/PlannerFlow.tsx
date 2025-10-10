@@ -1,13 +1,21 @@
 import {
-  applyEdgeChanges,
-  applyNodeChanges,
+  addEdge,
   Background,
   Controls,
+  type DefaultEdgeOptions,
+  type Edge,
+  type FitViewOptions,
+  type Node,
+  type OnConnect,
   ReactFlow,
+  useEdgesState,
+  useNodesState,
 } from "@xyflow/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import type { Plan_ResponseType } from "@/app/types";
 import PlanCard from "../Atoms/PlanCard";
+import CustomEdge from "../ReactFlow/CustomEdge";
+import { useRunConnectedNodes } from "@/store/store";
 
 export const PlannerFlow = ({
   contextData,
@@ -16,15 +24,15 @@ export const PlannerFlow = ({
   contextData: Record<string, string>;
   AI_Response: Plan_ResponseType;
 }) => {
-  const [nodes, setNodes] = useState<any[]>([]);
-  const [edges, setEdges] = useState<any[]>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
 
   useEffect(() => {
     if (!AI_Response || AI_Response.length === 0) return;
 
-    const generatedNodes = AI_Response.map((plan, index) => ({
+    const generatedNodes: Node[] = AI_Response.map((plan, index) => ({
       id: `n${index + 1}`,
-      position: { x: index * 300, y: 0 },
+      position: { x: index * 510, y: 0 },
       type: "plan",
       data: {
         planName: plan.planName,
@@ -32,27 +40,34 @@ export const PlannerFlow = ({
         planDescription: plan.planDescription,
         targetFile: plan.targetFile,
         codeData: contextData[plan.targetFile],
+        nodeId: `n${index + 1}`,
       },
     }));
 
-    const generatedEdges = AI_Response.slice(1).map((_, index) => ({
-      id: `e${index + 1}`,
-      source: `n${index + 1}`,
-      target: `n${index + 2}`,
-    }));
-
     setNodes(generatedNodes);
-    setEdges(generatedEdges);
-  }, [AI_Response, contextData]);
+  }, [AI_Response, contextData, setEdges, setNodes]);
 
-  const onNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    [],
-  );
+  const edgeTypes = {
+    "custom-edge": CustomEdge,
+  };
 
-  const onEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [],
+  const defaultEdgeOptions: DefaultEdgeOptions = {
+    animated: true,
+  };
+
+  const fitViewOptions: FitViewOptions = {
+    padding: 0.2,
+  };
+
+  const setRunState = useRunConnectedNodes((s) => s.setRunState);
+
+  const onConnect: OnConnect = useCallback(
+    (params) => {
+      const edge = { ...params, type: "custom-edge" };
+      setEdges((eds) => addEdge(edge, eds));
+      setRunState({ nodeId: params.source, status: false });
+    },
+    [setEdges],
   );
 
   const nodeTypes = { plan: PlanCard };
@@ -63,8 +78,12 @@ export const PlannerFlow = ({
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        fitViewOptions={fitViewOptions}
+        defaultEdgeOptions={defaultEdgeOptions}
         fitView
         className="bg-transparent text-black"
       >

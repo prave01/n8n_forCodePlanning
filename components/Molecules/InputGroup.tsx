@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import ImportSvg from "../SVGs/ImportSvg";
-import { useFileStore } from "@/store/useFileStore";
+import { useFileStore } from "@/store/store";
 import { redirect } from "next/navigation";
 import { parseZip } from "@/lib/utils";
 
