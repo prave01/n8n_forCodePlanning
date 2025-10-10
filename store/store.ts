@@ -14,7 +14,7 @@ type runConnectedNodes = {
     refData?: {
       fileName: string;
       code: string;
-    };
+    } | null;
   };
   setRunState: (buffer: {
     nodeId: string;
@@ -22,7 +22,7 @@ type runConnectedNodes = {
     refData?: {
       fileName: string;
       code: string;
-    };
+    } | null;
   }) => void;
 };
 

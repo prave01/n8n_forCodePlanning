@@ -14,7 +14,6 @@ import { useEffect, useState } from "react";
 import { replaceData } from "@/lib/utils";
 import { useFileStore, useRunConnectedNodes } from "@/store/store";
 import { toast } from "sonner";
-import { run } from "node:test";
 
 const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
   const [loading, setLoading] = useState(false);
@@ -28,9 +27,6 @@ const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
     }>
   >([]);
 
-  const runState = useRunConnectedNodes((s) => s.runState);
-  const setRunState = useRunConnectedNodes((s) => s.setRunState);
-
   const [cardState, setCardState] = useState<"ready" | "done" | "error">(
     "ready",
   );
@@ -40,11 +36,13 @@ const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
   const fileData = useFileStore((s) => s.fileData);
   const setFileData = useFileStore((s) => s.setFileData);
 
+  const runState = useRunConnectedNodes((s) => s.runState);
+  const setRunState = useRunConnectedNodes((s) => s.setRunState);
+
   useEffect(() => {
     if (runState.status) {
       const connections = getNodeConnections({
         nodeId: runState.nodeId,
-        type: "source",
       });
       console.log("Connections data", connections);
       if (connections.length === 0) return;
@@ -94,15 +92,30 @@ const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
         },
       ]);
       setCardState("done");
-      setRunState({
-        nodeId: data.nodeId,
-        status: true,
-        refData: {
-          code: response.code,
-          fileName: targetFile,
-        },
-      });
-      console.log("CodeResponse", targetFile, "\n", response);
+
+      const outgoingConnections = getNodeConnections({ nodeId: data.nodeId });
+
+      const hasOutgoing = outgoingConnections.some(
+        (c) => c.source === data.nodeId,
+      );
+
+      if (!hasOutgoing) {
+        console.log("This is the last node in the chain");
+        setRunState({
+          nodeId: data.nodeId,
+          status: false,
+          refData: null,
+        });
+      } else {
+        setRunState({
+          nodeId: data.nodeId,
+          status: true,
+          refData: {
+            code: response.code,
+            fileName: targetFile,
+          },
+        });
+      }
     } catch (err: any) {
       setLoading(false);
       setCardState("error");
@@ -210,12 +223,6 @@ const PlanCard = ({ data }: { data: PlanCardExtendedType }) => {
               items-center justify-center border-blue-500"
           >
             Execute on {targetFile}{" "}
-            {runState.refData?.code &&
-              runState.refData.fileName !== data.targetFile && (
-                <p className="text-white">
-                  Got data from {runState.refData.fileName}
-                </p>
-              )}
           </button>
         </CardHeader>
 

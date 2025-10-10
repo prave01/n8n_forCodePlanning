@@ -87,6 +87,7 @@ export const PlannerFlow = ({
         fitView
         className="bg-transparent text-black"
       >
+        <div className="absolute top-3 right-3 size-10 bg-white"></div>
         <Background className="bg-transparent text-black" />
         <Controls className="bg-transparent text-black" />
       </ReactFlow>
