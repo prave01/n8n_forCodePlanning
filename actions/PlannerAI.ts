@@ -1,36 +1,36 @@
-'use server'
+"use server";
 
-import OpenAI from 'openai'
-import { zodResponseFormat } from 'openai/helpers/zod.mjs'
-import { Plan_ResponseFormat } from '../app/zodSchema'
+import OpenAI from "openai";
+import { zodResponseFormat } from "openai/helpers/zod.mjs";
+import { Plan_ResponseFormat } from "../app/zodSchema";
 
-const API_KEY = process.env.GEMINI_API_KEY || null
+const API_KEY = process.env.GEMINI_API_KEY || null;
 
 export const generatePlan = async (
   context: Record<string, string>,
-  input: string
+  input: string,
 ) => {
   if (Object.keys(context).length === 0) {
-    throw Error('No context added, please add enough context')
+    throw Error("No context added, please add enough context");
   }
 
-  console.log(context)
+  console.log(context);
 
   if (!API_KEY) {
-    throw Error('Add API key in the configuration of the AI client')
+    throw Error("Add API key in the configuration of the AI client");
   }
 
   const client = new OpenAI({
     apiKey: API_KEY,
-    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
-  })
+    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai",
+  });
 
   try {
     const response = await client.chat.completions.parse({
-      model: 'gemini-2.5-flash',
+      model: "gemini-2.5-flash",
       messages: [
         {
-          role: 'system',
+          role: "system",
           content: `
 You are a Planner for executing a task, basically you gonna generate blue-print
 in the format like this,, based on the user input. 
@@ -60,19 +60,19 @@ NOTE:
 `,
         },
         {
-          role: 'user',
+          role: "user",
           content: input,
         },
       ],
-      response_format: zodResponseFormat(Plan_ResponseFormat, 'event'),
-    })
+      response_format: zodResponseFormat(Plan_ResponseFormat, "event"),
+    });
 
-    const event = response.choices[0].message.parsed
+    const event = response.choices[0].message.parsed;
 
-    console.log('AI response', event)
-    return event
+    console.log("AI response", event);
+    return event;
   } catch (err: any) {
-    console.error('AI Error:', err)
-    throw new Error('Internal error: ' + err.message)
+    console.error("AI Error:", err);
+    throw new Error("Internal error: " + err.message);
   }
-}
+};

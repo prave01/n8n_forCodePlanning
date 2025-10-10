@@ -9,22 +9,9 @@ import { parseZip } from "@/lib/utils";
 
 export const InputGroup = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [githubUrl, setGithubUrl] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const setFileData = useFileStore((s) => s.setFileData);
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-    if (isGitHubUrl(githubUrl)) return toast.success("Processing");
-    toast.error("Invalid github repo link");
-  };
-
-  const isGitHubUrl = (url: string) => {
-    const githubRegex =
-      /^https?:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(\.git)?\/?$/i;
-    return githubRegex.test(url);
-  };
 
   const handleFileChange = async (e: any) => {
     const file = e.target.files[0];
@@ -117,30 +104,8 @@ export const InputGroup = () => {
           text-center"
       >
         Import the project as{" "}
-        <span className="text-orange-500 font-semibold">Zip file</span> or{" "}
-        <br /> Paste the{" "}
-        <span className="text-orange-500 font-semibold">Github URL</span> of the
-        repo here
+        <span className="text-orange-500 font-semibold">Zip file</span>
       </div>
-      <form
-        onSubmit={handleSubmit}
-        className="flex px-3 gap-x-2 w-full py-auto"
-      >
-        <Input
-          value={githubUrl}
-          onChange={(e) => setGithubUrl(e.target.value)}
-          type="text"
-          required
-          className="flex-1 text-xs h-8 placeholder:text-xs"
-          placeholder="Paste url here"
-        />
-        <Button
-          className="text-xs px-2 h-8 dark:hover:bg-black dark:hover:text-white
-            cursor-pointer"
-        >
-          Go
-        </Button>
-      </form>
     </div>
   );
 };

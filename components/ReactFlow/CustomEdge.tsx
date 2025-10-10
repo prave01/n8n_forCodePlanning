@@ -1,12 +1,19 @@
 import {
   BaseEdge,
   EdgeLabelRenderer,
+  EdgeProps,
   getBezierPath,
   useReactFlow,
 } from "@xyflow/react";
 import { Button } from "../ui/button";
 
-export default function CustomEdge({ id, sourceX, sourceY, targetX, targetY }) {
+export default function CustomEdge({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+}: EdgeProps) {
   const { setEdges } = useReactFlow();
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,

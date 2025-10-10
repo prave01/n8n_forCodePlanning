@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useFileStore } from "@/store/store";
-import { buildTree } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { GridLoader } from "react-spinners";
+import { CodePanel } from "@/components/Templates/CodePanel";
+import { Plan } from "@/components/Templates/Plan";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { CodePanel } from "@/components/Templates/CodePanel";
-import { Plan } from "@/components/Templates/Plan";
-import { GridLoader } from "react-spinners";
+import { buildTree } from "@/lib/utils";
+import { useFileStore } from "@/store/store";
 
 export default function Page() {
   const router = useRouter();

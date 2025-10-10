@@ -1,7 +1,8 @@
 "use server";
 
 import OpenAI from "openai";
-import { zodResponseFormat } from "openai/helpers/zod.mjs";
+import { zodResponseFormat } from "openai/helpers/zod";
+import type { ZodType } from "zod";
 import { Execute_ResponseFormat } from "@/app/zodSchema";
 
 const API_KEY = process.env.GEMINI_API_KEY || null;
@@ -54,7 +55,11 @@ code: ${refData.code}
           content: prompt,
         },
       ],
-      response_format: zodResponseFormat(Execute_ResponseFormat, "event"),
+
+      response_format: zodResponseFormat(
+        Execute_ResponseFormat as unknown as any,
+        "event",
+      ),
     });
 
     const event = completion.choices[0].message.parsed;

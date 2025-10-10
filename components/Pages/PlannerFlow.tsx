@@ -18,11 +18,11 @@ import { useContextData, usePlan, useRunConnectedNodes } from "@/store/store";
 import { Button } from "../ui/button";
 import { PlanInput } from "../Atoms/PlanInput";
 import { GridLoader } from "react-spinners";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 export const PlannerFlow = ({ tree }: { tree: Record<string, any> }) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [open, setOpen] = useState(false);
 
   const [isLoading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ export const PlannerFlow = ({ tree }: { tree: Record<string, any> }) => {
     console.log("Plan", AI_Response);
     console.log("Context", contextData);
 
-    const generatedNodes: Node[] = AI_Response.map((plan, index) => ({
+    const generatedNodes: any = AI_Response.map((plan, index) => ({
       id: `n${index + 1}`,
       position: { x: index * 510, y: 0 },
       type: "plan",
@@ -93,24 +93,37 @@ export const PlannerFlow = ({ tree }: { tree: Record<string, any> }) => {
         fitView
         className="bg-transparent text-black"
       >
-        <Button
-          onClick={() => setOpen(!open)}
-          className="absolute top-3 z-40 hover:bg-black hover:border-1 border-zinc-700 cursor-pointer right-3 flex items-center justify-center size-10 bg-zinc-800 rounded-full text-2xl text-zinc-200"
+        <motion.div
+          className="absolute top-3 right-3 z-40"
+          initial={false}
+          animate={{
+            rotate: open ? 45 : 0, // rotate "+" to "x"
+          }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
         >
-          +
-        </Button>
-
-        {open && (
-          <motion.div
-            animate={{ scale: [0, 1] }}
-            transition={{ ease: "easeInOut", duration: 0.2 }}
-            style={{ transformOrigin: "top right" }}
-            className="w-md absolute backdrop-blur-md p-2 rounded-lg z-40 right-3 top-16"
+          <Button
+            onClick={() => setOpen(!open)}
+            className="hover:bg-black hover:border-1 border-zinc-700 cursor-pointer flex items-center justify-center size-10 bg-zinc-800 rounded-full text-2xl text-zinc-200"
           >
-            <PlanInput setLoading={setLoading} tree={tree} />
-          </motion.div>
-        )}
+            +
+          </Button>
+        </motion.div>
 
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              key="plan-input"
+              initial={{ opacity: 0, scale: 0.8, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: -10 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              style={{ transformOrigin: "top right" }}
+              className="w-md border-1 border-zinc-700 absolute backdrop-blur-md p-2 rounded-lg z-40 right-3 top-16"
+            >
+              <PlanInput setLoading={setLoading} tree={tree} />
+            </motion.div>
+          )}
+        </AnimatePresence>
         {isLoading && (
           <div
             className="backdrop-blur-md flex items-center justify-center absolute

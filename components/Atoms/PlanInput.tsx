@@ -125,10 +125,9 @@ export const PlanInput = ({
 
     try {
       setLoading(true);
-      const response: Plan_ResponseType = await generatePlan(
-        newContextData,
-        input,
-      );
+      const response: Plan_ResponseType =
+        (await generatePlan(newContextData, input)) || [];
+      setPlan(response);
 
       setPlan([...plan, ...response]);
       setLoading(false);
@@ -200,7 +199,7 @@ export const PlanInput = ({
               >
                 {suggestionData.map((item, index) => (
                   <div
-                    key={item}
+                    key={index}
                     ref={(el) => {
                       suggestionRefs.current[index] = el;
                     }}
