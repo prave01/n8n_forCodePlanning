@@ -1,36 +1,200 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Traycer - AI-Powered Code Planning and Execution Platform
+
+Traycer is a sophisticated web application that leverages artificial intelligence to analyze codebases, generate execution plans, and automate code modifications. The platform provides an intuitive visual interface for managing complex development workflows through an interactive node-based planning system.
+
+## Overview
+
+Traycer transforms the traditional code editing workflow by introducing AI-driven planning capabilities. Users can upload their projects as ZIP files, and the platform intelligently analyzes the codebase to generate actionable execution plans. These plans are presented as interactive nodes that can be connected to create complex workflows, enabling automated code generation and modification.
+
+## Core Features
+
+### Project Analysis
+
+- **ZIP File Import**: Upload entire projects as compressed archives for comprehensive analysis
+- **File Tree Visualization**: Interactive file browser with syntax highlighting and code preview
+- **Context-Aware Processing**: Intelligent extraction of relevant code context for AI processing
+
+### AI-Powered Planning
+
+- **Intelligent Plan Generation**: Uses Google's Gemini AI to analyze code and generate execution strategies
+- **Contextual Understanding**: Processes multiple files simultaneously to understand project structure and dependencies
+- **Dynamic Plan Creation**: Generates multiple execution plans based on user requirements and code complexity
+
+### Visual Workflow Management
+
+- **Interactive Node System**: Drag-and-drop interface for connecting execution plans
+- **Real-time Execution**: Live code generation and modification with immediate feedback
+- **Execution History**: Track all code changes with timestamps and status indicators
+- **Error Handling**: Comprehensive error reporting and recovery mechanisms
+
+### Code Management
+
+- **Syntax Highlighting**: Advanced code display with language-specific formatting
+- **Diff Visualization**: Side-by-side comparison of original and modified code
+- **Live Updates**: Real-time code modification and file system updates
+- **Export Capabilities**: Download modified code as updated ZIP files
+
+## Technology Stack
+
+### Frontend Framework
+
+- **Next.js 15.5.4**: React-based full-stack framework with App Router for optimal performance and SEO
+- **React 19.1.0**: Latest React version with concurrent features and improved rendering
+- **TypeScript 5**: Strong typing system for enhanced code reliability and developer experience
+
+### UI and Styling
+
+- **Tailwind CSS 4**: Utility-first CSS framework for rapid UI development
+- **Radix UI**: Accessible component primitives for professional UI components
+- **Lucide React**: Comprehensive icon library for consistent visual design
+- **Motion (Framer Motion)**: Advanced animations and transitions for smooth user experience
+
+### State Management
+
+- **Zustand 5.0.8**: Lightweight state management solution for complex application state
+- **React Flow (@xyflow/react)**: Specialized library for building interactive node-based interfaces
+
+### AI Integration
+
+- **OpenAI SDK 6.3.0**: Official client for Google Gemini AI integration
+- **Zod 3**: Runtime type validation and schema definition for AI response handling
+
+### Code Processing
+
+- **JSZip 3.10.1**: Client-side ZIP file processing and manipulation
+- **React Syntax Highlighter**: Advanced code syntax highlighting with multiple language support
+- **React Diff Viewer**: Professional diff visualization for code comparison
+
+### Development Tools
+
+- **Biome 2.2.0**: Fast linter and formatter for code quality assurance
+- **Prettier 3.6.2**: Code formatting with Tailwind CSS and import organization plugins
+- **Turbopack**: Next-generation bundler for faster development builds
+
+### Additional Libraries
+
+- **Sonner**: Modern toast notification system for user feedback
+- **React Spinners**: Loading indicators and progress visualization
+- **React Resizable Panels**: Flexible layout management with resizable components
+- **Next Themes**: Dark/light mode theming with system preference detection
+
+## Architecture
+
+### Component Structure
+
+The application follows atomic design principles with clear separation of concerns:
+
+- **Atoms**: Basic UI components (PlanCard, PlanInput)
+- **Molecules**: Composite components (InputGroup, FileTree)
+- **Templates**: Layout components (CodePanel, Plan)
+- **Pages**: Complete page implementations (PlannerFlow)
+
+### State Management
+
+Centralized state management using Zustand stores:
+
+- **File Store**: Manages uploaded project data and file system state
+- **Plan Store**: Handles AI-generated execution plans
+- **Context Store**: Manages code context for AI processing
+- **Run State Store**: Tracks execution status and node connections
+
+### AI Processing Pipeline
+
+1. **Context Extraction**: Analyzes uploaded codebase to identify relevant files
+2. **Plan Generation**: Uses Gemini AI to create execution strategies
+3. **Code Execution**: Processes individual plans with targeted AI prompts
+4. **Result Integration**: Merges generated code back into the project structure
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- Yarn package manager
+- Google Gemini API key
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd traycer
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+yarn install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Set up environment variables:
 
-## Learn More
+```bash
+cp .env.example .env.local
+```
 
-To learn more about Next.js, take a look at the following resources:
+Add your Google Gemini API key:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```env
+GEMINI_API_KEY=your_api_key_here
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Start the development server:
 
-## Deploy on Vercel
+```bash
+yarn dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Usage
+
+1. **Upload Project**: Import your project as a ZIP file through the drag-and-drop interface
+2. **Add Context**: Select relevant files using the @ symbol for AI context
+3. **Generate Plans**: Describe your requirements to generate execution plans
+4. **Connect Nodes**: Link plans together to create complex workflows
+5. **Execute Plans**: Run individual or connected plans to modify your code
+6. **Review Changes**: Examine generated code and apply changes to your project
+
+## Development
+
+### Code Quality
+
+The project uses Biome for linting and formatting:
+
+```bash
+yarn lint          # Check code quality
+yarn format        # Format code
+```
+
+### Building for Production
+
+```bash
+yarn build         # Build optimized production bundle
+yarn start         # Start production server
+```
+
+## API Integration
+
+The application integrates with Google's Gemini AI through the OpenAI-compatible API:
+
+- **Model**: gemini-2.5-flash for fast response times
+- **Response Format**: Structured JSON using Zod schemas
+- **Error Handling**: Comprehensive error management with user feedback
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run quality checks
+5. Submit a pull request
+
+## License
+
+This project is private and proprietary. All rights reserved.
+
+## Support
+
+For technical support or questions, please contact the development team or create an issue in the project repository.
