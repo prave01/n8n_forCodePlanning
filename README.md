@@ -1,4 +1,4 @@
-# Traycer Web - AI-Powered Code Planning and Execution Platform
+# AI-Powered Code Planning and Execution Platform
 
 #### Demo Video
 https://drive.google.com/file/d/18u3-_oHqUEsq9Fh8xfqnKJutdk0G7Cxu/view?usp=sharing
